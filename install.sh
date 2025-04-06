@@ -4,10 +4,27 @@ set -e
 
 ######################################################################################
 #                                                                                    #
-# Custom Pterodactyl Installer using Sajed214's repository                            #
+# Project 'pterodactyl-installer'                                                    #
 #                                                                                    #
-# Forked and adapted from:                                                          #
-# https://github.com/pterodactyl-installer/pterodactyl-installer                      #
+# Copyright (C) 2018 - 2025, Vilhelm Prytz, <vilhelm@prytznet.se>                    #
+#                                                                                    #
+#   This program is free software: you can redistribute it and/or modify             #
+#   it under the terms of the GNU General Public License as published by             #
+#   the Free Software Foundation, either version 3 of the License, or                #
+#   (at your option) any later version.                                              #
+#                                                                                    #
+#   This program is distributed in the hope that it will be useful,                  #
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of                   #
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                    #
+#   GNU General Public License for more details.                                     #
+#                                                                                    #
+#   You should have received a copy of the GNU General Public License                #
+#   along with this program.  If not, see <https://www.gnu.org/licenses/>.           #
+#                                                                                    #
+# https://github.com/pterodactyl-installer/pterodactyl-installer/blob/master/LICENSE #
+#                                                                                    #
+# This script is not associated with the official Pterodactyl Project.               #
+# https://github.com/pterodactyl-installer/pterodactyl-installer                     #
 #                                                                                    #
 ######################################################################################
 
@@ -17,23 +34,30 @@ export GITHUB_BASE_URL="https://raw.githubusercontent.com/Sajed214/tttt"
 
 LOG_PATH="/var/log/pterodactyl-installer.log"
 
-# check for curl
+# Check for curl
 if ! [ -x "$(command -v curl)" ]; then
-  echo "* curl is required in order for this script to work."
-  echo "* install using apt (Debian and derivatives) or yum/dnf (CentOS)"
+  echo "* curl is required for this script to work."
+  echo "* Install it using apt (Debian/Ubuntu) or yum/dnf (CentOS)"
   exit 1
 fi
 
 # Always remove lib.sh before downloading it
 [ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
-echo "Fetching lib.sh from: $GITHUB_BASE_URL/lib/lib.sh"
-curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL/lib/lib.sh"
+curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL"/master/lib/lib.sh
+
+# Ensure lib.sh is downloaded successfully
+if [ ! -f /tmp/lib.sh ]; then
+  echo "* Failed to download lib.sh from your repository."
+  exit 1
+fi
+
+# shellcheck source=lib/lib.sh
 source /tmp/lib.sh
 
 execute() {
   echo -e "\n\n* pterodactyl-installer $(date) \n\n" >>$LOG_PATH
 
-  [[ "$1" == *"canary"* ]] && export GITHUB_SOURCE="main" && export SCRIPT_RELEASE="canary"
+  [[ "$1" == *"canary"* ]] && export GITHUB_SOURCE="master" && export SCRIPT_RELEASE="canary"
   update_lib_source
   run_ui "${1//_canary/}" |& tee -a $LOG_PATH
 
@@ -57,10 +81,10 @@ while [ "$done" == false ]; do
     "Install the panel"
     "Install Wings"
     "Install both [0] and [1] on the same machine (wings script runs after panel)"
-    "Install panel with canary version of the script"
-    "Install Wings with canary version of the script"
+    "Install panel with canary version of the script (the versions that live in master, may be broken!)"
+    "Install Wings with canary version of the script (the versions that live in master, may be broken!)"
     "Install both [3] and [4] on the same machine (wings script runs after panel)"
-    "Uninstall panel or wings with canary version of the script"
+    "Uninstall panel or wings with canary version of the script (the versions that live in master, may be broken!)"
   )
 
   actions=(
@@ -89,5 +113,5 @@ while [ "$done" == false ]; do
   [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}" && execute "$i1" "$i2"
 done
 
-# Clean up
+# Remove lib.sh so the newest version is downloaded next time the script is run
 rm -rf /tmp/lib.sh
