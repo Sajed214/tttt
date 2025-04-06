@@ -3,12 +3,17 @@
 set -e
 
 ######################################################################################
-# Custom Pterodactyl Installer using Sajed214's repository                            #
+#                                                                                    #
+# Custom Pterodactyl Installer using Sajed214's repository                          #
+#                                                                                    #
+# Forked and adapted from:                                                          #
+# https://github.com/pterodactyl-installer/pterodactyl-installer                    #
+#                                                                                    #
 ######################################################################################
 
 export GITHUB_SOURCE="v1.1.1"
 export SCRIPT_RELEASE="v1.1.1"
-export GITHUB_BASE_URL="https://raw.githubusercontent.com/Sajed214/tttt"
+export GITHUB_BASE_URL="https://raw.githubusercontent.com/Sajed214/tttt/main"
 
 LOG_PATH="/var/log/pterodactyl-installer.log"
 
@@ -19,17 +24,10 @@ if ! [ -x "$(command -v curl)" ]; then
   exit 1
 fi
 
-# Always remove lib.sh before downloading it
+# Always remove lib.sh, before downloading it
 [ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
-echo "Fetching lib.sh from: $GITHUB_BASE_URL/lib/lib.sh"
-curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL/main/lib/lib.sh"
-
-# Check if the download was successful
-if [ ! -f /tmp/lib.sh ]; then
-  echo "Error: lib.sh could not be downloaded from $GITHUB_BASE_URL/lib/lib.sh"
-  exit 1
-fi
-
+curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL/lib/lib.sh"
+# shellcheck source=lib/lib.sh
 source /tmp/lib.sh
 
 execute() {
@@ -59,10 +57,10 @@ while [ "$done" == false ]; do
     "Install the panel"
     "Install Wings"
     "Install both [0] and [1] on the same machine (wings script runs after panel)"
-    "Install panel with canary version of the script"
-    "Install Wings with canary version of the script"
+    "Install panel with canary version of the script (the versions that lives in master, may be broken!)"
+    "Install Wings with canary version of the script (the versions that lives in master, may be broken!)"
     "Install both [3] and [4] on the same machine (wings script runs after panel)"
-    "Uninstall panel or wings with canary version of the script"
+    "Uninstall panel or wings with canary version of the script (the versions that lives in master, may be broken!)"
   )
 
   actions=(
@@ -91,5 +89,5 @@ while [ "$done" == false ]; do
   [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}" && execute "$i1" "$i2"
 done
 
-# Clean up
+# Remove lib.sh, so next time the script is run the newest version is downloaded.
 rm -rf /tmp/lib.sh
