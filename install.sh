@@ -30,26 +30,20 @@ set -e
 
 export GITHUB_SOURCE="v1.1.1"
 export SCRIPT_RELEASE="v1.1.1"
-export GITHUB_BASE_URL="https://raw.githubusercontent.com/Sajed214/tttt"
+export GITHUB_BASE_URL="https://raw.githubusercontent.com/Sajed214/tttt"  # Updated to your repository
 
 LOG_PATH="/var/log/pterodactyl-installer.log"
 
-# Check for curl
+# check for curl
 if ! [ -x "$(command -v curl)" ]; then
-  echo "* curl is required for this script to work."
-  echo "* Install it using apt (Debian/Ubuntu) or yum/dnf (CentOS)"
+  echo "* curl is required in order for this script to work."
+  echo "* install using apt (Debian and derivatives) or yum/dnf (CentOS)"
   exit 1
 fi
 
-# Always remove lib.sh before downloading it
+# Always remove lib.sh, before downloading it
 [ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
-curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL"/master/lib/lib.sh
-
-# Ensure lib.sh is downloaded successfully
-if [ ! -f /tmp/lib.sh ]; then
-  echo "* Failed to download lib.sh from your repository."
-  exit 1
-fi
+curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL"/main/lib/lib.sh  # Updated to point to your repo
 
 # shellcheck source=lib/lib.sh
 source /tmp/lib.sh
@@ -81,16 +75,20 @@ while [ "$done" == false ]; do
     "Install the panel"
     "Install Wings"
     "Install both [0] and [1] on the same machine (wings script runs after panel)"
-    "Install panel with canary version of the script (the versions that live in master, may be broken!)"
-    "Install Wings with canary version of the script (the versions that live in master, may be broken!)"
+    # "Uninstall panel or wings\n"
+
+    "Install panel with canary version of the script (the versions that lives in master, may be broken!)"
+    "Install Wings with canary version of the script (the versions that lives in master, may be broken!)"
     "Install both [3] and [4] on the same machine (wings script runs after panel)"
-    "Uninstall panel or wings with canary version of the script (the versions that live in master, may be broken!)"
+    "Uninstall panel or wings with canary version of the script (the versions that lives in master, may be broken!)"
   )
 
   actions=(
     "panel"
     "wings"
     "panel;wings"
+    # "uninstall"
+
     "panel_canary"
     "wings_canary"
     "panel_canary;wings_canary"
@@ -113,5 +111,5 @@ while [ "$done" == false ]; do
   [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}" && execute "$i1" "$i2"
 done
 
-# Remove lib.sh so the newest version is downloaded next time the script is run
+# Remove lib.sh, so next time the script is run the, newest version is downloaded.
 rm -rf /tmp/lib.sh
