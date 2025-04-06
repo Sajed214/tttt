@@ -42,10 +42,10 @@ if ! [ -x "$(command -v curl)" ]; then
 fi
 
 # Always remove lib.sh, before downloading it
-# [ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
-# curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL"/master/lib/lib.sh
-source=lib/lib.sh
-# source /tmp/lib.sh
+[ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
+curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL"/master/lib/lib.sh
+# source=lib/lib.sh
+source /tmp/lib.sh
 
 execute() {
   echo -e "\n\n* pterodactyl-installer $(date) \n\n" >>$LOG_PATH
