@@ -4,16 +4,16 @@ set -e
 
 ######################################################################################
 #                                                                                    #
-# Custom Pterodactyl Installer using Sajed214's repository                          #
+# Custom Pterodactyl Installer using Sajed214's repository                            #
 #                                                                                    #
 # Forked and adapted from:                                                          #
-# https://github.com/pterodactyl-installer/pterodactyl-installer                    #
+# https://github.com/pterodactyl-installer/pterodactyl-installer                      #
 #                                                                                    #
 ######################################################################################
 
 export GITHUB_SOURCE="v1.1.1"
 export SCRIPT_RELEASE="v1.1.1"
-export GITHUB_BASE_URL="https://raw.githubusercontent.com/Sajed214/tttt/main"
+export GITHUB_BASE_URL="https://raw.githubusercontent.com/Sajed214/tttt"
 
 LOG_PATH="/var/log/pterodactyl-installer.log"
 
@@ -24,8 +24,9 @@ if ! [ -x "$(command -v curl)" ]; then
   exit 1
 fi
 
-# Always remove lib.sh, before downloading it
+# Always remove lib.sh before downloading it
 [ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
+echo "Fetching lib.sh from: $GITHUB_BASE_URL/lib/lib.sh"
 curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL/lib/lib.sh"
 source /tmp/lib.sh
 
@@ -88,4 +89,5 @@ while [ "$done" == false ]; do
   [[ " ${valid_input[*]} " =~ ${action} ]] && done=true && IFS=";" read -r i1 i2 <<<"${actions[$action]}" && execute "$i1" "$i2"
 done
 
+# Clean up
 rm -rf /tmp/lib.sh
